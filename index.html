@@ -124,6 +124,7 @@
 
                     <div class="btn-group">
                         <button class="btn-primary" onclick="copyQuote()">📋 Copia Preventivo</button>
+                        <button class="btn-primary" style="background: #f59e0b;" onclick="copyOrder()">📦 Copia Ordine</button>
                         <button class="btn-success" onclick="saveHistory()">💾 Salva Storico</button>
                     </div>
                 </div>
@@ -335,37 +336,117 @@
             document.getElementById('netPrice').textContent = '€' + final.toFixed(2);
         }
 
+        function copyToClipboardFallback(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                return true;
+            } catch (err) {
+                document.body.removeChild(textarea);
+                return false;
+            }
+        }
+
         function copyQuote() {
-            if (!selectedProduct) return;
+            console.log('copyQuote chiamata');
             
-            const qty = document.getElementById('qty').value;
-            const net = document.getElementById('netPrice').textContent;
-            
-            // Calcola trasporto
-            const peso = parseFloat(selectedProduct.peso) || 0;
-            const pesoTotale = peso * parseInt(qty);
-            let trasporto;
-            
-            if (pesoTotale <= 100) {
-                trasporto = '€20,00';
-            } else {
-                const quintali = Math.ceil(pesoTotale / 100);
-                const costoTrasporto = quintali * 15;
-                trasporto = '€' + costoTrasporto.toFixed(2).replace('.', ',');
+            if (!selectedProduct) {
+                alert('Nessun prodotto selezionato');
+                return;
             }
             
-            const quote = `CODICE ARTICOLO: ${selectedProduct.codice}
-TENSIONE: ${selectedProduct.v}V
-CAPACITÀ: ${selectedProduct.ah}Ah
-DIMENSIONI: ${selectedProduct.lunghezza}x${selectedProduct.larghezza}x${selectedProduct.altezza}mm
+            try {
+                const qty = document.getElementById('qty').value;
+                const net = document.getElementById('netPrice').textContent;
+                
+                const peso = parseFloat(selectedProduct.peso) || 0;
+                const pesoTotale = peso * parseInt(qty);
+                let trasporto;
+                
+                if (pesoTotale <= 100) {
+                    trasporto = '€20,00';
+                } else {
+                    const quintali = Math.ceil(pesoTotale / 100);
+                    const costoTrasporto = quintali * 15;
+                    trasporto = '€' + costoTrasporto.toFixed(2).replace('.', ',');
+                }
+                
+                const ah = parseFloat(selectedProduct.ah) || 0;
+                let qreUnitario;
+                if (ah <= 20) {
+                    qreUnitario = 0.26;
+                } else if (ah <= 95) {
+                    qreUnitario = 1.10;
+                } else {
+                    qreUnitario = 2.20;
+                }
+                const qreFormatted = '€' + qreUnitario.toFixed(2).replace('.', ',') + ' Cad. Btr.';
+                
+                const quote = 'CODICE ARTICOLO: ' + selectedProduct.codice + '\n' +
+                    'TENSIONE: ' + selectedProduct.v + 'V\n' +
+                    'CAPACITA: ' + selectedProduct.ah + 'Ah\n' +
+                    'DIMENSIONI: ' + selectedProduct.lunghezza + 'x' + selectedProduct.larghezza + 'x' + selectedProduct.altezza + 'mm\n' +
+                    '\n' +
+                    'Q.TA OFFERTA: ' + qty + ' pz\n' +
+                    'PREZZO NETTO: ' + net + ' cad.\n' +
+                    'TRASPORTO: ' + trasporto + '\n' +
+                    'QRE: ' + qreFormatted + '\n' +
+                    'CONSEGNA: Pronta Consegna';
+                
+                if (copyToClipboardFallback(quote)) {
+                    alert('Preventivo copiato!');
+                } else {
+                    alert('Errore nella copia');
+                }
+            } catch (e) {
+                console.error('Errore:', e);
+                alert('Errore: ' + e.message);
+            }
+        }
 
-Q.TÀ OFFERTA: ${qty} pz
-PREZZO NETTO: ${net} cad.
-TRASPORTO: ${trasporto}
-CONSEGNA: Pronta Consegna`;
+        function copyOrder() {
+            console.log('copyOrder chiamata');
             
-            navigator.clipboard.writeText(quote);
-            alert('Preventivo copiato!');
+            if (!selectedProduct) {
+                alert('Nessun prodotto selezionato');
+                return;
+            }
+            
+            try {
+                const qty = document.getElementById('qty').value;
+                const net = document.getElementById('netPrice').textContent;
+                
+                const peso = parseFloat(selectedProduct.peso) || 0;
+                const pesoTotale = peso * parseInt(qty);
+                let trasporto;
+                
+                if (pesoTotale <= 100) {
+                    trasporto = '€20,00';
+                } else {
+                    const quintali = Math.ceil(pesoTotale / 100);
+                    const costoTrasporto = quintali * 15;
+                    trasporto = '€' + costoTrasporto.toFixed(2).replace('.', ',');
+                }
+                
+                const order = 'Nr. ' + qty + ' ' + selectedProduct.codice + ': ' + net + '\n' +
+                    'Trasporto: ' + trasporto;
+                
+                if (copyToClipboardFallback(order)) {
+                    alert('Ordine copiato!');
+                } else {
+                    alert('Errore nella copia');
+                }
+            } catch (e) {
+                console.error('Errore:', e);
+                alert('Errore: ' + e.message);
+            }
         }
 
         function saveHistory() {
@@ -445,14 +526,27 @@ CONSEGNA: Pronta Consegna`;
                 trasporto = '€' + costoTrasporto.toFixed(2).replace('.', ',');
             }
             
+            // Calcola QRE (solo costo unitario)
+            const ah = parseFloat(prod.ah) || 0;
+            let qreUnitario;
+            if (ah <= 20) {
+                qreUnitario = 0.26;
+            } else if (ah <= 95) {
+                qreUnitario = 1.10;
+            } else {
+                qreUnitario = 2.20;
+            }
+            const qreFormatted = '€' + qreUnitario.toFixed(2).replace('.', ',') + ' Cad. Btr.';
+            
             const quote = `CODICE ARTICOLO: ${prod.codice}
 TENSIONE: ${prod.v}V
-CAPACITÀ: ${prod.ah}Ah
+CAPACITA': ${prod.ah}Ah
 DIMENSIONI: ${prod.lunghezza}x${prod.larghezza}x${prod.altezza}mm
 
-Q.TÀ OFFERTA: ${item.qty} pz
+Q.TA' OFFERTA: ${item.qty} pz
 PREZZO NETTO: ${item.price} cad.
 TRASPORTO: ${trasporto}
+QRE: ${qreFormatted}
 CONSEGNA: Pronta Consegna`;
             
             navigator.clipboard.writeText(quote);
