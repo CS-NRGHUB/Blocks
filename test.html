@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#34495e">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://www.ibsbatterie.it/wp-content/uploads/2020/01/logo.png">
+    <title>IBS Batterie - Blocks</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #34495e; min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { color: #e74c3c; font-size: 28px; }
+        .header img { height: 50px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { background: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; color: #34495e; }
+        .tab.active { background: #e74c3c; color: white; }
+        .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input[type="text"], input[type="number"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; font-size: 14px; }
+        button { background: #e74c3c; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #c0392b; }
+        .product-list { max-height: 300px; overflow-y: auto; }
+        .product-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .product-item:hover { background: #f5f5f5; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px; }
+        .label { font-size: 12px; color: #666; margin-bottom: 5px; }
+        .value { font-size: 16px; font-weight: bold; }
+        .price-box { background: #34495e; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; color: white; }
+        .hidden { display: none; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-primary { flex: 1; }
+        .btn-orange { background: #f39c12; flex: 1; }
+        .btn-orange:hover { background: #e67e22; }
+        .btn-green { background: #27ae60; }
+        .btn-green:hover { background: #229954; }
+        .history-item { background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .btn-danger { background: #95a5a6; }
+        .btn-danger:hover { background: #7f8c8d; }
+        .search-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .search-tab { flex: 1; padding: 10px; background: #ecf0f1; border: none; border-radius: 5px; cursor: pointer; }
+        .search-tab.active { background: #e74c3c; color: white; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 10px; padding: 30px; max-width: 500px; width: 90%; }
+        .modal-content h3 { margin-bottom: 15px; color: #34495e; }
+        .modal-content p { color: #7f8c8d; margin-bottom: 20px; }
+        .firebase-status { font-size: 12px; padding: 4px 10px; border-radius: 12px; font-weight: bold; }
+        .firebase-status.ok { background: #d4edda; color: #155724; }
+        .firebase-status.err { background: #f8d7da; color: #721c24; }
+
+        /* Tab Trova Alternativa */
+        .alt-drop-zone { border: 2px dashed #ddd; border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 15px; background: #fafafa; }
+        .alt-drop-zone.drag-over { border-color: #e74c3c; background: #fdf0f0; }
+        .alt-drop-zone p { color: #999; margin-top: 8px; font-size: 13px; }
+        .alt-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-bottom: 10px; display: none; }
+        .specs-box { background: #f0f4f8; border-radius: 8px; padding: 15px; margin: 15px 0; }
+        .specs-box h4 { color: #34495e; margin-bottom: 10px; font-size: 14px; }
+        .specs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .spec-item { background: white; border-radius: 6px; padding: 8px; text-align: center; }
+        .spec-item .spec-label { font-size: 10px; color: #999; }
+        .spec-item .spec-val { font-size: 16px; font-weight: bold; color: #34495e; }
+        .alt-card { background: #f9fafb; border-radius: 8px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #e74c3c; }
+        .alt-card.best { border-left-color: #27ae60; }
+        .alt-card.second { border-left-color: #f39c12; }
+        .alt-badge { font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 8px; }
+        .badge-green { background: #d4edda; color: #155724; }
+        .badge-orange { background: #fff3cd; color: #856404; }
+        .badge-red { background: #f8d7da; color: #721c24; }
+        .alt-specs { display: flex; gap: 15px; flex-wrap: wrap; font-size: 13px; color: #666; margin: 5px 0; }
+        .loading-spinner { text-align: center; padding: 30px; color: #999; }
+        .spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid #eee; border-top-color: #e74c3c; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .search-source { font-size: 11px; color: #aaa; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>IBS Batterie</h1>
+                <p style="color: #666;">Blocks - Gestione Preventivi &nbsp; <span id="fbStatus" class="firebase-status">⏳ Connessione...</span></p>
+            </div>
+            <img src="https://www.ibsbatterie.it/wp-content/uploads/2020/01/logo.png" alt="Logo" onerror="this.style.display='none'">
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('search')">🔍 Ricerca</button>
+            <button class="tab" onclick="showTab('alternative')">🔄 Alternativa</button>
+            <button class="tab" onclick="showTab('upload')">📤 Carica File</button>
+            <button class="tab" onclick="showTab('history')">🕐 Storico</button>
+        </div>
+
+        <div id="searchTab">
+            <div class="card">
+                <div class="search-tabs">
+                    <button class="search-tab active" onclick="setSearchType('code')">Cerca per Codice</button>
+                    <button class="search-tab" onclick="setSearchType('dim')">Cerca per Dimensioni</button>
+                </div>
+
+                <div id="codeSearch">
+                    <input type="text" id="searchInput" placeholder="Cerca codice articolo..." oninput="search()">
+                    <div id="results" class="product-list"></div>
+                </div>
+
+                <div id="dimSearch" class="hidden">
+                    <div class="grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div>
+                            <div class="label">Lunghezza (mm)</div>
+                            <input type="number" id="dimL" placeholder="260" oninput="searchByDim()">
+                        </div>
+                        <div>
+                            <div class="label">Larghezza (mm)</div>
+                            <input type="number" id="dimW" placeholder="180" oninput="searchByDim()">
+                        </div>
+                        <div>
+                            <div class="label">Altezza (mm)</div>
+                            <input type="number" id="dimH" placeholder="247" oninput="searchByDim()">
+                        </div>
+                    </div>
+                    <div id="dimResults" class="product-list"></div>
+                </div>
+            </div>
+
+            <div id="productCard" class="card hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 id="prodCode" style="margin: 0; font-size: 28px; color: #e74c3c;"></h2>
+                    <a id="prodLink" href="#" target="_blank" style="background: #f39c12; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: 600;">🔗 Vedi prodotto</a>
+                </div>
+                
+                <div class="grid">
+                    <div><div class="label">Tensione</div><div class="value" id="prodV"></div></div>
+                    <div><div class="label">Capacità</div><div class="value" id="prodAh"></div></div>
+                    <div><div class="label">Dimensioni</div><div class="value" id="prodDim"></div></div>
+                    <div><div class="label">Peso</div><div class="value" id="prodPeso"></div></div>
+                    <div><div class="label">Q.tà Pallet</div><div class="value" id="prodPallet"></div></div>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <div class="label">Prezzo Listino</div>
+                    <div class="value" id="prodListino" style="font-size: 24px; margin-bottom: 20px; color: #e74c3c;"></div>
+                    
+                    <div class="grid">
+                        <div>
+                            <div class="label">Sconto 1 %</div>
+                            <input type="number" id="disc1" placeholder="0" min="0" max="100" step="0.1" oninput="calculate()">
+                        </div>
+                        <div>
+                            <div class="label">Sconto 2 %</div>
+                            <input type="number" id="disc2" placeholder="0" min="0" max="100" step="0.1" oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <div class="label">Quantità</div>
+                    <input type="number" id="qty" value="1" min="1" oninput="calculate()">
+
+                    <div class="price-box">
+                        <span style="font-size: 18px; font-weight: 700;">Prezzo Netto:</span>
+                        <span id="netPrice" style="font-size: 28px; font-weight: 700;">€0.00</span>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-primary" onclick="copyQuote()">📋 Copia Preventivo</button>
+                        <button class="btn-orange" onclick="copyOrder()">📦 Copia Ordine</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="alternativeTab" class="hidden">
+            <div class="card">
+                <h3 style="margin-bottom: 5px; color: #34495e;">🔄 Trova Alternativa IBS</h3>
+                <p style="color: #999; font-size: 13px; margin-bottom: 15px;">Inserisci il codice della batteria concorrente oppure carica una foto dell'etichetta</p>
+
+                <!-- Foto opzionale -->
+                <div class="alt-drop-zone" id="dropZone" onclick="document.getElementById('altPhotoInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                    <img id="altPreview" class="alt-preview">
+                    <div id="dropText">
+                        <div style="font-size: 36px;">📷</div>
+                        <strong>Carica foto etichetta</strong>
+                        <p>Clicca o trascina qui una foto (opzionale)</p>
+                    </div>
+                </div>
+                <input type="file" id="altPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
+
+                <!-- Input testo -->
+                <div class="label">Codice o descrizione batteria concorrente *</div>
+                <input type="text" id="altCodeInput" placeholder="Es: FIAMM FG21803, Yuasa NP18-12, 12V 18Ah...">
+
+                <button onclick="findAlternative()" style="width: 100%; margin-top: 5px;">🔍 Cerca Alternativa IBS</button>
+            </div>
+
+            <!-- Risultati -->
+            <div id="altLoading" class="card hidden">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px;" id="altLoadingMsg">Ricerca in corso...</p>
+                </div>
+            </div>
+
+            <div id="altResults" class="hidden">
+                <!-- Specs trovate -->
+                <div class="card">
+                    <h4 style="color: #34495e; margin-bottom: 10px;">📋 Specifiche rilevate</h4>
+                    <div class="specs-grid">
+                        <div class="spec-item">
+                            <div class="spec-label">Tensione</div>
+                            <div class="spec-val" id="foundV">—</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Capacità</div>
+                            <div class="spec-val" id="foundAh">—</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Lunghezza</div>
+                            <div class="spec-val" id="foundL">—</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Larghezza</div>
+                            <div class="spec-val" id="foundW">—</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Altezza</div>
+                            <div class="spec-val" id="foundH">—</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Tipo</div>
+                            <div class="spec-val" id="foundType">—</div>
+                        </div>
+                    </div>
+                    <div class="search-source" id="altSource"></div>
+                </div>
+
+                <!-- Alternative IBS -->
+                <div class="card">
+                    <h4 style="color: #34495e; margin-bottom: 15px;">✅ Alternative IBS trovate</h4>
+                    <div id="altList"></div>
+                </div>
+            </div>
+
+            <div id="altEmpty" class="card hidden" style="text-align: center; padding: 40px;">
+                <div style="font-size: 40px;">😕</div>
+                <p style="color: #999; margin-top: 10px;" id="altEmptyMsg">Nessuna alternativa trovata nel catalogo.</p>
+            </div>
+        </div>
+
+        <div id="uploadTab" class="hidden">
+            <div class="card">
+                <h3 style="margin-bottom: 15px; color: #34495e;">Carica Listino Prodotti</h3>
+                <input type="file" id="listFile" accept=".csv,.xlsx,.xls" onchange="loadList(event)">
+                <p style="color: #666; font-size: 13px; margin-top: 10px;">Prodotti caricati: <span id="prodCount">0</span></p>
+            </div>
+        </div>
+
+        <div id="historyTab" class="hidden">
+            <div id="historyList"></div>
+            <div id="emptyHistory" class="card" style="text-align: center; padding: 60px 20px;">
+                <p style="color: #999;">Nessun preventivo salvato</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="saveModal" class="modal">
+        <div class="modal-content">
+            <h3>Salva Preventivo</h3>
+            <p>Vuoi salvare questo preventivo nello storico?</p>
+            <div class="label">Nome Cliente</div>
+            <input type="text" id="clientName" placeholder="Inserisci nome cliente...">
+            <div class="btn-group">
+                <button class="btn-green" onclick="confirmSave()">✓ Salva</button>
+                <button class="btn-danger" onclick="closeSaveModal()">✗ Non Salvare</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFZ6QAL88qbm22Xzdaui1cB5fdwwucDBk",
+            authDomain: "blocks-639a1.firebaseapp.com",
+            databaseURL: "https://blocks-639a1-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "blocks-639a1",
+            storageBucket: "blocks-639a1.firebasestorage.app",
+            messagingSenderId: "877637253241",
+            appId: "1:877637253241:web:64638d7e542e14a964bca8"
+        };
+
+        let db;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+
+            // Test connessione
+            db.ref('.info/connected').on('value', (snap) => {
+                const el = document.getElementById('fbStatus');
+                if (snap.val() === true) {
+                    el.textContent = '🟢 Firebase connesso';
+                    el.className = 'firebase-status ok';
+                } else {
+                    el.textContent = '🔴 Firebase offline';
+                    el.className = 'firebase-status err';
+                }
+            });
+
+        } catch (e) {
+            console.error('Errore Firebase:', e);
+            document.getElementById('fbStatus').textContent = '🔴 Errore Firebase';
+            document.getElementById('fbStatus').className = 'firebase-status err';
+        }
+
+        let products = [];
+        let history = [];
+        let selectedProduct = null;
+        let searchType = 'code';
+        let pendingQuote = null;
+
+        window.onload = () => {
+            loadProducts();
+            loadHistory();
+        };
+
+        function loadProducts() {
+            if (db) {
+                db.ref('products').on('value', (snapshot) => {
+                    const val = snapshot.val();
+                    products = val ? Object.values(val) : [];
+                    document.getElementById('prodCount').textContent = products.length;
+                });
+            } else {
+                products = JSON.parse(localStorage.getItem('ibs-products') || '[]');
+                document.getElementById('prodCount').textContent = products.length;
+            }
+        }
+
+        function loadHistory() {
+            if (db) {
+                db.ref('history').on('value', (snapshot) => {
+                    const val = snapshot.val();
+                    history = val ? Object.values(val).sort((a, b) => b.id - a.id) : [];
+                    renderHistory();
+                });
+            } else {
+                history = JSON.parse(localStorage.getItem('ibs-history') || '[]');
+                renderHistory();
+            }
+        }
+
+        // ── GOOGLE CUSTOM SEARCH CONFIG ──
+        const GOOGLE_API_KEY = 'AIzaSyB7-Sw5F0ODE7x5kjf7fBqALJ-rOxJYOAs';
+        const GOOGLE_CX      = '67607c68d5c9c4edc';
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('searchTab').className        = tab === 'search'      ? '' : 'hidden';
+            document.getElementById('alternativeTab').className   = tab === 'alternative' ? '' : 'hidden';
+            document.getElementById('uploadTab').className        = tab === 'upload'      ? '' : 'hidden';
+            document.getElementById('historyTab').className       = tab === 'history'     ? '' : 'hidden';
+        }
+
+        // ── FOTO DRAG & DROP ──
+        let altPhotoBase64 = null;
+
+        function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+        function handleDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
+        function handleDrop(e) {
+            e.preventDefault();
+            handleDragLeave();
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) processPhoto(file);
+        }
+        function handlePhotoSelect(e) {
+            const file = e.target.files[0];
+            if (file) processPhoto(file);
+        }
+        function processPhoto(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                altPhotoBase64 = e.target.result;
+                const preview = document.getElementById('altPreview');
+                preview.src = altPhotoBase64;
+                preview.style.display = 'block';
+                document.getElementById('dropText').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ── TROVA ALTERNATIVA ──
+        async function findAlternative() {
+            const code = document.getElementById('altCodeInput').value.trim();
+            if (!code && !altPhotoBase64) return alert('Inserisci un codice o carica una foto!');
+            if (products.length === 0) return alert('Carica prima il listino prodotti IBS nella tab "Carica File"!');
+
+            // Reset UI
+            document.getElementById('altResults').classList.add('hidden');
+            document.getElementById('altEmpty').classList.add('hidden');
+            document.getElementById('altLoading').classList.remove('hidden');
+            setLoadingMsg('Analisi del prodotto...');
+
+            try {
+                // Step 1: estrai specs dal codice tramite pattern noti
+                let specs = extractSpecsFromCode(code);
+
+                // Step 2: se non trovate, cerca su Google
+                if (!specs.v || !specs.ah) {
+                    setLoadingMsg('Ricerca su Google...');
+                    specs = await searchSpecsOnGoogle(code, specs);
+                }
+
+                // Step 3: match nel catalogo IBS
+                setLoadingMsg('Ricerca alternative IBS...');
+                const alternatives = findIBSAlternatives(specs);
+
+                document.getElementById('altLoading').classList.add('hidden');
+
+                if (alternatives.length === 0) {
+                    document.getElementById('altEmptyMsg').textContent =
+                        specs.v || specs.ah
+                            ? `Nessuna alternativa trovata per ${specs.v ? specs.v+'V' : ''} ${specs.ah ? specs.ah+'Ah' : ''} nel catalogo IBS.`
+                            : 'Non riesco a trovare le specifiche. Prova a inserire V e Ah nel campo testo (es: "12V 18Ah").';
+                    document.getElementById('altEmpty').classList.remove('hidden');
+                    return;
+                }
+
+                // Mostra specs rilevate
+                document.getElementById('foundV').textContent    = specs.v    ? specs.v + 'V'    : '—';
+                document.getElementById('foundAh').textContent   = specs.ah   ? specs.ah + 'Ah'  : '—';
+                document.getElementById('foundL').textContent    = specs.l    ? specs.l + 'mm'   : '—';
+                document.getElementById('foundW').textContent    = specs.w    ? specs.w + 'mm'   : '—';
+                document.getElementById('foundH').textContent    = specs.h    ? specs.h + 'mm'   : '—';
+                document.getElementById('foundType').textContent = specs.type || '—';
+                document.getElementById('altSource').textContent = specs.source || '';
+
+                // Mostra alternative
+                const badges = [
+                    { label: '⭐ Migliore corrispondenza', cls: 'badge-green', cardCls: 'best' },
+                    { label: '2ª scelta',                  cls: 'badge-orange', cardCls: 'second' },
+                    { label: '3ª scelta',                  cls: 'badge-red',    cardCls: '' },
+                ];
+                document.getElementById('altList').innerHTML = alternatives.slice(0, 3).map((p, i) => {
+                    const b = badges[i] || badges[2];
+                    const diffV  = specs.v  ? Math.abs(parseFloat(p.v)  - parseFloat(specs.v))  : null;
+                    const diffAh = specs.ah ? Math.abs(parseFloat(p.ah) - parseFloat(specs.ah)) : null;
+                    const matchNote = [
+                        diffV  !== null ? (diffV  === 0 ? '✓ Tensione esatta'   : `Δ ${diffV}V`)   : '',
+                        diffAh !== null ? (diffAh === 0 ? '✓ Capacità esatta'   : `Δ ${diffAh}Ah`) : '',
+                    ].filter(Boolean).join(' &nbsp;·&nbsp; ');
+
+                    return `<div class="alt-card ${b.cardCls}">
+                        <span class="alt-badge ${b.cls}">${b.label}</span>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div style="font-size:20px; font-weight:bold; color:#e74c3c;">${p.codice}</div>
+                                <div class="alt-specs">
+                                    <span>⚡ ${p.v}V</span>
+                                    <span>🔋 ${p.ah}Ah</span>
+                                    <span>📐 ${p.lunghezza}×${p.larghezza}×${p.altezza}mm</span>
+                                    <span>⚖️ ${p.peso}kg</span>
+                                </div>
+                                <div style="font-size:12px; color:#888; margin-top:4px;">${matchNote}</div>
+                            </div>
+                            <div style="text-align:right; flex-shrink:0; margin-left:10px;">
+                                <div style="font-size:18px; font-weight:bold; color:#34495e;">€${p.listino.toFixed(2)}</div>
+                                <button class="btn-green" style="margin-top:8px; padding:8px 12px; font-size:12px;"
+                                    onclick="selectProductFromAlt('${p.codice}')">
+                                    📋 Usa per preventivo
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                document.getElementById('altResults').classList.remove('hidden');
+
+            } catch (err) {
+                document.getElementById('altLoading').classList.add('hidden');
+                alert('Errore durante la ricerca: ' + err.message);
+                console.error(err);
+            }
+        }
+
+        function setLoadingMsg(msg) {
+            document.getElementById('altLoadingMsg').textContent = msg;
+        }
+
+        // Estrae V e Ah direttamente dal codice/testo (pattern comuni)
+        function extractSpecsFromCode(text) {
+            const specs = { v: null, ah: null, l: null, w: null, h: null, type: null, source: '' };
+            if (!text) return specs;
+            const t = text.toUpperCase();
+
+            // Tensione: 12V, 6V, 24V, 48V...
+            const vMatch = t.match(/\b(2|4|6|8|12|24|36|48|72|80)\s*V\b/);
+            if (vMatch) specs.v = vMatch[1];
+
+            // Capacità: 18Ah, 100AH, 18 AH...
+            const ahMatch = t.match(/\b(\d{1,4})\s*AH\b/);
+            if (ahMatch) specs.ah = ahMatch[1];
+
+            // Dimensioni: 181x77x167mm o simili
+            const dimMatch = t.match(/(\d{2,3})\s*[xX×]\s*(\d{2,3})\s*[xX×]\s*(\d{2,3})/);
+            if (dimMatch) { specs.l = dimMatch[1]; specs.w = dimMatch[2]; specs.h = dimMatch[3]; }
+
+            // Tipo
+            if (t.includes('AGM') || t.includes('VRLA')) specs.type = 'AGM';
+            else if (t.includes('GEL')) specs.type = 'GEL';
+            else if (t.includes('LITIO') || t.includes('LIFEPO') || t.includes('LFP')) specs.type = 'LiFePO4';
+
+            if (specs.v || specs.ah) specs.source = '📝 Specifiche estratte dal testo inserito';
+            return specs;
+        }
+
+        // Cerca su Google Custom Search e prova a parsare il risultato
+        async function searchSpecsOnGoogle(query, existingSpecs) {
+            const q = encodeURIComponent(query + ' batteria specifiche tecniche V Ah dimensioni datasheet');
+            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_CX}&q=${q}&num=5`;
+
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error('Google API error: ' + resp.status);
+            const data = await resp.json();
+
+            if (!data.items || data.items.length === 0) return existingSpecs;
+
+            // Combina tutti gli snippet e prova a estrarre specs
+            const fullText = data.items.map(item =>
+                (item.title || '') + ' ' + (item.snippet || '') + ' ' + (item.pagemap?.metatags?.[0]?.['og:description'] || '')
+            ).join(' ');
+
+            const specs = extractSpecsFromCode(fullText);
+
+            // Mantieni specs già trovate dal codice
+            if (!specs.v  && existingSpecs.v)  specs.v  = existingSpecs.v;
+            if (!specs.ah && existingSpecs.ah) specs.ah = existingSpecs.ah;
+            if (!specs.l  && existingSpecs.l)  specs.l  = existingSpecs.l;
+            if (!specs.w  && existingSpecs.w)  specs.w  = existingSpecs.w;
+            if (!specs.h  && existingSpecs.h)  specs.h  = existingSpecs.h;
+
+            if (specs.v || specs.ah) {
+                specs.source = `🌐 Specifiche trovate tramite ricerca web (fonte: ${data.items[0].displayLink})`;
+            }
+            return specs;
+        }
+
+        // Match nel catalogo IBS: prima dimensioni, poi V e Ah
+        function findIBSAlternatives(specs) {
+            let candidates = [...products];
+
+            // Filtro dimensioni se disponibili (±10mm)
+            if (specs.l && specs.w && specs.h) {
+                const l = parseFloat(specs.l), w = parseFloat(specs.w), h = parseFloat(specs.h);
+                const byDim = candidates.filter(p =>
+                    Math.abs((parseFloat(p.lunghezza)||0) - l) <= 10 &&
+                    Math.abs((parseFloat(p.larghezza)||0) - w) <= 10 &&
+                    Math.abs((parseFloat(p.altezza)||0)   - h) <= 10
+                );
+                if (byDim.length > 0) candidates = byDim;
+            }
+
+            // Filtro tensione esatta se disponibile
+            if (specs.v) {
+                const byV = candidates.filter(p => parseFloat(p.v) === parseFloat(specs.v));
+                if (byV.length > 0) candidates = byV;
+            }
+
+            // Ordina per Ah più vicino
+            if (specs.ah) {
+                const targetAh = parseFloat(specs.ah);
+                candidates.sort((a, b) =>
+                    Math.abs((parseFloat(a.ah)||0) - targetAh) -
+                    Math.abs((parseFloat(b.ah)||0) - targetAh)
+                );
+            }
+
+            return candidates.slice(0, 3);
+        }
+
+        // Passa il prodotto alla tab Ricerca per fare il preventivo
+        function selectProductFromAlt(code) {
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', i === 0);
+            });
+            ['searchTab','alternativeTab','uploadTab','historyTab'].forEach((id, i) => {
+                document.getElementById(id).className = i === 0 ? '' : 'hidden';
+            });
+            document.getElementById('searchInput').value = code;
+            search();
+            setTimeout(() => selectProduct(code), 100);
+        }
+
+        function setSearchType(type) {
+            searchType = type;
+            document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('codeSearch').className = type === 'code' ? '' : 'hidden';
+            document.getElementById('dimSearch').className = type === 'dim' ? '' : 'hidden';
+        }
+
+        function loadList(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                let text = evt.target.result;
+                if (text.charCodeAt(0) === 0xFEFF) text = text.substr(1);
+                const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+                if (lines.length === 0) return alert('File vuoto!');
+                const productsData = lines.slice(1).map(line => {
+                    const vals = line.split(';').map(v => v.trim());
+                    let price = vals[9] || '0';
+                    price = price.replace('€', '').replace(/\s/g, '').replace(',', '.');
+                    return {
+                        codice: vals[0] || '',
+                        v: vals[1] || '',
+                        ah: vals[2] || '',
+                        lunghezza: vals[3] || '',
+                        larghezza: vals[4] || '',
+                        altezza: vals[5] || '',
+                        peso: vals[7] || '',
+                        qtaPallet: vals[8] || '',
+                        listino: parseFloat(price) || 0
+                    };
+                }).filter(p => p.codice);
+                
+                if (db) {
+                    db.ref('products').set(productsData)
+                        .then(() => alert(`✅ ${productsData.length} prodotti caricati su Firebase!`))
+                        .catch(err => alert('❌ Errore upload: ' + err.message));
+                } else {
+                    localStorage.setItem('ibs-products', JSON.stringify(productsData));
+                    products = productsData;
+                    document.getElementById('prodCount').textContent = productsData.length;
+                    alert(`${productsData.length} prodotti caricati!`);
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function search() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            if (!term) { document.getElementById('results').innerHTML = ''; return; }
+            const filtered = products.filter(p => p.codice.toLowerCase().includes(term)).slice(0, 20);
+            document.getElementById('results').innerHTML = filtered.map(p => 
+                `<div class="product-item" onclick="selectProduct('${p.codice}')">
+                    <div style="font-weight: bold;">${p.codice}</div>
+                    <div style="font-size: 12px; color: #666;">${p.v}V - ${p.ah}Ah - €${p.listino.toFixed(2)}</div>
+                </div>`
+            ).join('');
+        }
+
+        function searchByDim() {
+            const l = parseFloat(document.getElementById('dimL').value) || 0;
+            const w = parseFloat(document.getElementById('dimW').value) || 0;
+            const h = parseFloat(document.getElementById('dimH').value) || 0;
+            if (!l && !w && !h) { document.getElementById('dimResults').innerHTML = ''; return; }
+            const filtered = products.filter(p => {
+                const pl = parseFloat(p.lunghezza) || 0;
+                const pw = parseFloat(p.larghezza) || 0;
+                const ph = parseFloat(p.altezza) || 0;
+                return (l ? Math.abs(pl - l) <= 10 : true) &&
+                       (w ? Math.abs(pw - w) <= 10 : true) &&
+                       (h ? Math.abs(ph - h) <= 10 : true);
+            }).slice(0, 20);
+            document.getElementById('dimResults').innerHTML = filtered.map(p => 
+                `<div class="product-item" onclick="selectProduct('${p.codice}')">
+                    <div style="font-weight: bold;">${p.codice}</div>
+                    <div style="font-size: 12px; color: #666;">${p.lunghezza}x${p.larghezza}x${p.altezza}mm - €${p.listino.toFixed(2)}</div>
+                </div>`
+            ).join('');
+        }
+
+        function selectProduct(code) {
+            selectedProduct = products.find(p => p.codice === code);
+            if (!selectedProduct) return;
+            document.getElementById('productCard').classList.remove('hidden');
+            document.getElementById('prodCode').textContent = selectedProduct.codice;
+            document.getElementById('prodLink').href = `https://www.ibsbatterie.it/?s=${encodeURIComponent(selectedProduct.codice)}`;
+            document.getElementById('prodV').textContent = selectedProduct.v + 'V';
+            document.getElementById('prodAh').textContent = selectedProduct.ah + 'Ah';
+            document.getElementById('prodDim').textContent = `${selectedProduct.lunghezza}x${selectedProduct.larghezza}x${selectedProduct.altezza}mm`;
+            document.getElementById('prodPeso').textContent = selectedProduct.peso + 'kg';
+            document.getElementById('prodPallet').textContent = selectedProduct.qtaPallet || '-';
+            document.getElementById('prodListino').textContent = '€' + selectedProduct.listino.toFixed(2);
+            document.getElementById('disc1').value = '';
+            document.getElementById('disc2').value = '';
+            document.getElementById('qty').value = 1;
+            document.getElementById('searchInput').value = '';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('dimL').value = '';
+            document.getElementById('dimW').value = '';
+            document.getElementById('dimH').value = '';
+            document.getElementById('dimResults').innerHTML = '';
+            calculate();
+            document.getElementById('productCard').scrollIntoView({behavior: 'smooth'});
+        }
+
+        function calculate() {
+            if (!selectedProduct) return;
+            const list = selectedProduct.listino;
+            const d1 = parseFloat(document.getElementById('disc1').value) || 0;
+            const d2 = parseFloat(document.getElementById('disc2').value) || 0;
+            const after1 = list * (1 - d1/100);
+            const final = after1 * (1 - d2/100);
+            document.getElementById('netPrice').textContent = '€' + final.toFixed(2);
+        }
+
+        function copyToClipboardFallback(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                return true;
+            } catch (err) {
+                document.body.removeChild(textarea);
+                return false;
+            }
+        }
+
+        function copyQuote() {
+            if (!selectedProduct) return;
+            const qty = document.getElementById('qty').value;
+            const net = document.getElementById('netPrice').textContent;
+            const peso = parseFloat(selectedProduct.peso) || 0;
+            const pesoTotale = peso * parseInt(qty);
+            let trasporto = pesoTotale <= 100 ? '€20,00' : '€' + (Math.ceil(pesoTotale / 100) * 15).toFixed(2).replace('.', ',');
+            const ah = parseFloat(selectedProduct.ah) || 0;
+            let qreUnitario = ah <= 20 ? 0.26 : (ah <= 95 ? 1.10 : 2.20);
+            const qreFormatted = '€' + qreUnitario.toFixed(2).replace('.', ',') + ' Cad. Btr.';
+            const quote = 'CODICE ARTICOLO: ' + selectedProduct.codice + '\n' +
+                'TENSIONE: ' + selectedProduct.v + 'V\n' +
+                'CAPACITA: ' + selectedProduct.ah + 'Ah\n' +
+                'DIMENSIONI: ' + selectedProduct.lunghezza + 'x' + selectedProduct.larghezza + 'x' + selectedProduct.altezza + 'mm\n\n' +
+                'Q.TA OFFERTA: ' + qty + ' pz\n' +
+                'PREZZO NETTO: ' + net + ' cad.\n' +
+                'TRASPORTO: ' + trasporto + '\n' +
+                'QRE: ' + qreFormatted + '\n' +
+                'CONSEGNA: Pronta Consegna';
+            
+            pendingQuote = {
+                quote,
+                codice: selectedProduct.codice,
+                qty,
+                price: net,
+                disc1: document.getElementById('disc1').value || 0,
+                disc2: document.getElementById('disc2').value || 0
+            };
+            
+            if (copyToClipboardFallback(quote)) {
+                document.getElementById('saveModal').classList.add('show');
+            }
+        }
+
+        function copyOrder() {
+            if (!selectedProduct) return;
+            const qty = document.getElementById('qty').value;
+            const net = document.getElementById('netPrice').textContent;
+            const peso = parseFloat(selectedProduct.peso) || 0;
+            const pesoTotale = peso * parseInt(qty);
+            let trasporto = pesoTotale <= 100 ? '€20,00' : '€' + (Math.ceil(pesoTotale / 100) * 15).toFixed(2).replace('.', ',');
+            const order = 'Buongiorno,\nper il cliente in oggetto nuovo ordine del seguente materiale:\n\n' +
+                'Nr. ' + qty + ' ' + selectedProduct.codice + ': ' + net + '\n' +
+                'Trasporto: ' + trasporto + '\n\n' +
+                'Grazie\nBuona giornata';
+            if (copyToClipboardFallback(order)) alert('Ordine copiato!');
+        }
+
+        function closeSaveModal() {
+            document.getElementById('saveModal').classList.remove('show');
+            document.getElementById('clientName').value = '';
+            pendingQuote = null;
+        }
+
+        function confirmSave() {
+            const clientName = document.getElementById('clientName').value.trim();
+            if (!clientName) return alert('Inserisci il nome del cliente');
+            
+            const item = {
+                id: Date.now(),
+                date: new Date().toLocaleString('it-IT'),
+                cliente: clientName,
+                codice: pendingQuote.codice,
+                quantita: pendingQuote.qty,
+                prezzoNetto: pendingQuote.price,
+                sconto1: pendingQuote.disc1,
+                sconto2: pendingQuote.disc2,
+                testo: pendingQuote.quote
+            };
+            
+            if (db) {
+                db.ref('history/' + item.id).set(item)
+                    .then(() => {
+                        closeSaveModal();
+                        alert('✅ Preventivo salvato su Firebase!');
+                    })
+                    .catch(err => alert('❌ Errore salvataggio: ' + err.message));
+            } else {
+                history.unshift(item);
+                history = history.slice(0, 20);
+                localStorage.setItem('ibs-history', JSON.stringify(history));
+                renderHistory();
+                closeSaveModal();
+                alert('Preventivo salvato!');
+            }
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            const empty = document.getElementById('emptyHistory');
+            if (history.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+            list.innerHTML = history.map(h => `
+                <div class="history-item">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <div>
+                            <div style="font-weight: bold; font-size: 18px; color: #e74c3c;">${h.cliente}</div>
+                            <div style="font-weight: bold; font-size: 14px; margin-top: 3px;">${h.codice}</div>
+                            <div style="font-size: 12px; color: #666; margin-top: 3px;">${h.date}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 12px; color: #666;">${h.quantita}pz</div>
+                            <div style="font-size: 18px; font-weight: bold; color: #34495e;">${h.prezzoNetto}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button style="flex: 1;" onclick="copyHistoryQuote(${h.id})">📋 Copia Preventivo</button>
+                        <button class="btn-orange" style="flex: 1;" onclick="convertToOrder(${h.id})">📦 Converti in Ordine</button>
+                        <button class="btn-danger" onclick="deleteHistory(${h.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function copyHistoryQuote(id) {
+            const item = history.find(h => h.id === id);
+            if (!item || !item.testo) return;
+            if (copyToClipboardFallback(item.testo)) alert('Preventivo copiato!');
+        }
+
+        function convertToOrder(id) {
+            const item = history.find(h => h.id === id);
+            if (!item) return;
+            const prod = products.find(p => p.codice === item.codice);
+            if (!prod) return alert('Prodotto non trovato');
+            const peso = parseFloat(prod.peso) || 0;
+            const pesoTotale = peso * parseInt(item.quantita);
+            let trasporto = pesoTotale <= 100 ? '€20,00' : '€' + (Math.ceil(pesoTotale / 100) * 15).toFixed(2).replace('.', ',');
+            const order = 'Buongiorno,\nper il cliente in oggetto nuovo ordine del seguente materiale:\n\n' +
+                'Nr. ' + item.quantita + ' ' + item.codice + ': ' + item.prezzoNetto + '\n' +
+                'Trasporto: ' + trasporto + '\n\n' +
+                'Grazie\nBuona giornata';
+            if (copyToClipboardFallback(order)) alert('Ordine copiato!');
+        }
+
+        function deleteHistory(id) {
+            if (!confirm('Eliminare questo preventivo?')) return;
+            if (db) {
+                db.ref('history/' + id).remove()
+                    .catch(err => alert('❌ Errore eliminazione: ' + err.message));
+            } else {
+                history = history.filter(h => h.id !== id);
+                localStorage.setItem('ibs-history', JSON.stringify(history));
+                renderHistory();
+            }
+        }
+    </script>
+</body>
+</html>
