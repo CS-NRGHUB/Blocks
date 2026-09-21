@@ -52,6 +52,59 @@
         .firebase-status { font-size: 12px; padding: 4px 10px; border-radius: 12px; font-weight: bold; }
         .firebase-status.ok { background: #d4edda; color: #155724; }
         .firebase-status.err { background: #f8d7da; color: #721c24; }
+
+        /* Carrello flottante */
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: #27ae60; color: white; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); transition: all 0.3s; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; cursor: pointer; }
+        .cart-header-left { display: flex; align-items: center; gap: 10px; }
+        .cart-title { font-weight: bold; font-size: 16px; }
+        .cart-badge { background: white; color: #27ae60; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; }
+        .cart-total-preview { font-size: 15px; font-weight: bold; }
+        .cart-toggle-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+        .cart-body { background: white; color: #333; max-height: 0; overflow: hidden; transition: max-height 0.3s; }
+        .cart-body.open { max-height: 500px; overflow-y: auto; }
+        .cart-items { padding: 15px; }
+        .cart-empty { color: #999; text-align: center; padding: 20px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; gap: 10px; }
+        .cart-item-info { flex: 1; }
+        .cart-item-code { font-weight: bold; color: #e74c3c; font-size: 15px; }
+        .cart-item-detail { font-size: 12px; color: #666; margin-top: 2px; }
+        .cart-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .cart-qty-input { width: 50px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; text-align: center; font-size: 14px; }
+        .cart-item-price { font-weight: bold; color: #34495e; min-width: 70px; text-align: right; }
+        .cart-remove-btn { background: #e74c3c; border: none; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 14px; line-height: 1; display: flex; align-items: center; justify-content: center; }
+        .cart-footer { padding: 15px; border-top: 2px solid #eee; background: #f9f9f9; }
+        .cart-total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .cart-total-label { font-size: 14px; color: #666; }
+        .cart-total-amount { font-size: 22px; font-weight: bold; color: #34495e; }
+        .cart-actions { display: flex; gap: 10px; }
+        .cart-copy-btn { flex: 1; background: #27ae60; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .cart-clear-btn { background: #95a5a6; color: white; border: none; padding: 12px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        body { padding-bottom: 70px; }
+
+        /* Tab Trova Alternativa */
+        .alt-drop-zone { border: 2px dashed #ddd; border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 15px; background: #fafafa; }
+        .alt-drop-zone.drag-over { border-color: #e74c3c; background: #fdf0f0; }
+        .alt-drop-zone p { color: #999; margin-top: 8px; font-size: 13px; }
+        .alt-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-bottom: 10px; display: none; }
+        .specs-box { background: #f0f4f8; border-radius: 8px; padding: 15px; margin: 15px 0; }
+        .specs-box h4 { color: #34495e; margin-bottom: 10px; font-size: 14px; }
+        .specs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .spec-item { background: white; border-radius: 6px; padding: 8px; text-align: center; }
+        .spec-item .spec-label { font-size: 10px; color: #999; }
+        .spec-item .spec-val { font-size: 16px; font-weight: bold; color: #34495e; }
+        .alt-card { background: #f9fafb; border-radius: 8px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #e74c3c; }
+        .alt-card.best { border-left-color: #27ae60; }
+        .alt-card.second { border-left-color: #f39c12; }
+        .alt-badge { font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 8px; }
+        .badge-green { background: #d4edda; color: #155724; }
+        .badge-orange { background: #fff3cd; color: #856404; }
+        .badge-red { background: #f8d7da; color: #721c24; }
+        .alt-specs { display: flex; gap: 15px; flex-wrap: wrap; font-size: 13px; color: #666; margin: 5px 0; }
+        .loading-spinner { text-align: center; padding: 30px; color: #999; }
+        .spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid #eee; border-top-color: #e74c3c; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .search-source { font-size: 11px; color: #aaa; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -138,11 +191,94 @@
                         <span id="netPrice" style="font-size: 28px; font-weight: 700;">€0.00</span>
                     </div>
 
-                    <div class="btn-group">
-                        <button class="btn-primary" onclick="copyQuote()">📋 Copia Preventivo</button>
-                        <button class="btn-orange" onclick="copyOrder()">📦 Copia Ordine</button>
+                    <div class="btn-group" style="flex-wrap: wrap;">
+                        <button class="btn-primary" style="flex: 1 1 45%;" onclick="copyQuote()">📋 Preventivo Strutturato</button>
+                        <button style="flex: 1 1 45%; background: #8e44ad;" onclick="copyQuoteRapido()">⚡ Preventivo Rapido</button>
+                        <button class="btn-orange" style="flex: 1 1 45%;" onclick="copyOrder()">📦 Ordine Singolo</button>
+                        <button class="btn-green" style="flex: 1 1 45%;" onclick="addToCart()">🛒 Ordine Multiplo</button>
+                        <button style="flex: 1 1 100%; background: #2980b9;" onclick="sendOrderByEmail()">✉️ Invia Ordine Singolo per Email</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="alternativeTab" class="hidden">
+            <div class="card">
+                <h3 style="margin-bottom: 5px; color: #34495e;">🔄 Trova Alternativa IBS</h3>
+                <p style="color: #999; font-size: 13px; margin-bottom: 15px;">Inserisci il codice della batteria concorrente oppure carica una foto dell'etichetta</p>
+
+                <!-- Foto opzionale -->
+                <div class="alt-drop-zone" id="dropZone" onclick="document.getElementById('altPhotoInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                    <img id="altPreview" class="alt-preview">
+                    <div id="dropText">
+                        <div style="font-size: 36px;">📷</div>
+                        <strong>Carica foto etichetta</strong>
+                        <p>Clicca o trascina qui una foto (opzionale)</p>
+                    </div>
+                </div>
+                <input type="file" id="altPhotoInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
+
+                <!-- Input testo -->
+                <div class="label">Codice o descrizione batteria concorrente *</div>
+                <input type="text" id="altCodeInput" placeholder="Es: FIAMM FG21803, Yuasa NP18-12, 12V 18Ah...">
+
+                <div style="display:flex; gap:10px; margin-top:5px;">
+                    <button onclick="findAlternative()" style="flex:1;">🔍 Cerca Alternativa IBS</button>
+                    <button onclick="resetAlternative()" style="background:#95a5a6; padding: 12px 16px;">🗑️ Reset</button>
+                </div>
+            </div>
+
+            <!-- Risultati -->
+            <div id="altLoading" class="card hidden">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px;" id="altLoadingMsg">Ricerca in corso...</p>
+                </div>
+            </div>
+
+            <div id="altResults" class="hidden">
+                <!-- Specs trovate -->
+                <div class="card">
+                    <h4 style="color: #34495e; margin-bottom: 10px;">📋 Specifiche rilevate</h4>
+                    <div class="specs-grid">
+                        <div class="spec-item">
+                            <div class="spec-label">Tensione</div>
+                            <div class="spec-val" id="foundV">—</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Capacità</div>
+                            <div class="spec-val" id="foundAh">—</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Lunghezza</div>
+                            <div class="spec-val" id="foundL">—</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Larghezza</div>
+                            <div class="spec-val" id="foundW">—</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Altezza</div>
+                            <div class="spec-val" id="foundH">—</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-label">Tipo</div>
+                            <div class="spec-val" id="foundType">—</div>
+                        </div>
+                    </div>
+                    <div class="search-source" id="altSource"></div>
+                </div>
+
+                <!-- Alternative IBS -->
+                <div class="card">
+                    <h4 style="color: #34495e; margin-bottom: 15px;">✅ Alternative IBS trovate</h4>
+                    <div id="altList"></div>
+                </div>
+            </div>
+
+            <div id="altEmpty" class="card hidden" style="text-align: center; padding: 40px;">
+                <div style="font-size: 40px;">😕</div>
+                <p style="color: #999; margin-top: 10px;" id="altEmptyMsg">Nessuna alternativa trovata nel catalogo.</p>
             </div>
         </div>
 
@@ -162,6 +298,37 @@
         </div>
     </div>
 
+    <!-- CARRELLO FLOTTANTE -->
+    <div class="cart-bar" id="cartBar">
+        <div class="cart-header" onclick="toggleCart()">
+            <div class="cart-header-left">
+                <span>🛒</span>
+                <span class="cart-title">Ordine Multiplo</span>
+                <span class="cart-badge" id="cartBadge">0</span>
+            </div>
+            <div class="cart-header-left">
+                <span class="cart-total-preview" id="cartTotalPreview">€0,00</span>
+                <button class="cart-toggle-btn" id="cartToggleBtn">▲</button>
+            </div>
+        </div>
+        <div class="cart-body" id="cartBody">
+            <div class="cart-items" id="cartItems">
+                <div class="cart-empty">Il carrello è vuoto</div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total-row">
+                    <span class="cart-total-label">Totale ordine</span>
+                    <span class="cart-total-amount">€ <span id="cartTotalVal">0,00</span></span>
+                </div>
+                <div class="cart-actions">
+                    <button class="cart-copy-btn" onclick="copyCartOrder()">📋 Copia Ordine</button>
+                    <button class="cart-copy-btn" style="background:#2980b9;" onclick="sendCartOrderByEmail()">✉️ Invia per Email</button>
+                    <button class="cart-clear-btn" onclick="clearCart()">🗑️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="saveModal" class="modal">
         <div class="modal-content">
             <h3>Salva Preventivo</h3>
@@ -171,6 +338,19 @@
             <div class="btn-group">
                 <button class="btn-green" onclick="confirmSave()">✓ Salva</button>
                 <button class="btn-danger" onclick="closeSaveModal()">✗ Non Salvare</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <h3>✉️ Invia Ordine per Email</h3>
+            <p>Inserisci il nome del cliente per l'oggetto della mail</p>
+            <div class="label">Nome Cliente</div>
+            <input type="text" id="emailClientName" placeholder="Es: Mario Rossi Srl...">
+            <div class="btn-group">
+                <button style="flex:1; background:#2980b9;" onclick="confirmSendEmail()">✉️ Apri Email</button>
+                <button class="btn-danger" style="flex:1;" onclick="closeEmailModal()">✗ Annulla</button>
             </div>
         </div>
     </div>
@@ -215,6 +395,72 @@
         let searchType = 'code';
         let pendingQuote = null;
 
+        // ── EMAIL ──
+        const MAIL_TO = 'ordini@ibsbatterie.it';
+        let pendingEmailBody = '';
+
+        function openEmailModal(body) {
+            pendingEmailBody = body;
+            document.getElementById('emailClientName').value = '';
+            document.getElementById('emailModal').classList.add('show');
+            setTimeout(() => document.getElementById('emailClientName').focus(), 100);
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').classList.remove('show');
+            pendingEmailBody = '';
+        }
+
+        function confirmSendEmail() {
+            const cliente = document.getElementById('emailClientName').value.trim();
+            if (!cliente) return alert('Inserisci il nome del cliente');
+            const oggetto = encodeURIComponent('Nuovo Ordine - ' + cliente);
+            const corpo = encodeURIComponent(pendingEmailBody);
+            window.location.href = `mailto:${MAIL_TO}?subject=${oggetto}&body=${corpo}`;
+            closeEmailModal();
+        }
+
+        function sendOrderByEmail() {
+            if (!selectedProduct) return;
+            const qty = parseInt(document.getElementById('qty').value) || 1;
+            const net = document.getElementById('netPrice').textContent;
+            const netVal = parseFloat(net.replace('€','').replace(',','.')) || 0;
+            const peso = parseFloat(selectedProduct.peso) || 0;
+            const trasporto = calcTrasporto(peso * qty, netVal * qty);
+            const body =
+                'Buongiorno,\nper il cliente in oggetto nuovo ordine del seguente materiale:\n\n' +
+                'Nr. ' + qty + ' ' + selectedProduct.codice + ': ' + net + ' cad.\n' +
+                'Trasporto: ' + trasporto + '\n\n' +
+                'Grazie\nBuona giornata';
+            openEmailModal(body);
+        }
+
+        function sendCartOrderByEmail() {
+            const items = Object.values(cart);
+            if (items.length === 0) return alert('Il carrello è vuoto!');
+            const pesoTotale = items.reduce((s, i) => s + (parseFloat(i.product.peso) || 0) * i.qty, 0);
+            const valoreMerce = items.reduce((s, i) => s + i.netPrice * i.qty, 0);
+            const trasporto = calcTrasporto(pesoTotale, valoreMerce);
+            const righe = items.map(i =>
+                'Nr. ' + i.qty + ' ' + i.product.codice + ': €' + i.netPrice.toFixed(2) + ' cad.'
+            ).join('\n');
+            const body =
+                'Buongiorno,\nper il cliente in oggetto nuovo ordine del seguente materiale:\n\n' +
+                righe + '\n' +
+                'Trasporto: ' + trasporto + '\n\n' +
+                'Grazie\nBuona giornata';
+            openEmailModal(body);
+        }
+
+        // ── CALCOLO TRASPORTO ──
+        // 0-100kg: €20 fissi | 101kg+: €15/quintale arrotondato per eccesso | >€3000 valore merce: incluso
+        function calcTrasporto(pesoKg, valoreMerce) {
+            if (valoreMerce >= 3000) return 'Incluso';
+            if (pesoKg <= 100) return '€20,00';
+            const quintali = Math.ceil(pesoKg / 100);
+            return '€' + (quintali * 15).toFixed(2).replace('.', ',');
+        }
+
         window.onload = () => {
             loadProducts();
             loadHistory();
@@ -246,12 +492,259 @@
             }
         }
 
+        // ── GOOGLE CUSTOM SEARCH CONFIG ──
+        const GOOGLE_API_KEY = 'AIzaSyB7-Sw5F0ODE7x5kjf7fBqALJ-rOxJYOAs';
+        const GOOGLE_CX      = '67607c68d5c9c4edc';
+
         function showTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-            document.getElementById('searchTab').className = tab === 'search' ? '' : 'hidden';
-            document.getElementById('uploadTab').className = tab === 'upload' ? '' : 'hidden';
-            document.getElementById('historyTab').className = tab === 'history' ? '' : 'hidden';
+            document.getElementById('searchTab').className        = tab === 'search'  ? '' : 'hidden';
+            document.getElementById('uploadTab').className        = tab === 'upload'  ? '' : 'hidden';
+            document.getElementById('historyTab').className       = tab === 'history' ? '' : 'hidden';
+        }
+
+        // ── FOTO DRAG & DROP ──
+        let altPhotoBase64 = null;
+
+        function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+        function handleDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
+        function handleDrop(e) {
+            e.preventDefault();
+            handleDragLeave();
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) processPhoto(file);
+        }
+        function handlePhotoSelect(e) {
+            const file = e.target.files[0];
+            if (file) processPhoto(file);
+        }
+        function processPhoto(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                altPhotoBase64 = e.target.result;
+                const preview = document.getElementById('altPreview');
+                preview.src = altPhotoBase64;
+                preview.style.display = 'block';
+                document.getElementById('dropText').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ── TROVA ALTERNATIVA ──
+        async function findAlternative() {
+            const code = document.getElementById('altCodeInput').value.trim();
+            if (!code && !altPhotoBase64) return alert('Inserisci un codice o carica una foto!');
+            if (products.length === 0) return alert('Carica prima il listino prodotti IBS nella tab "Carica File"!');
+
+            // Reset UI
+            document.getElementById('altResults').classList.add('hidden');
+            document.getElementById('altEmpty').classList.add('hidden');
+            document.getElementById('altLoading').classList.remove('hidden');
+            setLoadingMsg('Analisi del prodotto...');
+
+            try {
+                // Step 1: estrai specs dal codice tramite pattern noti
+                let specs = extractSpecsFromCode(code);
+
+                // Step 2: se non trovate, cerca su Google
+                if (!specs.v || !specs.ah) {
+                    setLoadingMsg('Ricerca su Google...');
+                    specs = await searchSpecsOnGoogle(code, specs);
+                }
+
+                // Step 3: match nel catalogo IBS
+                setLoadingMsg('Ricerca alternative IBS...');
+                const alternatives = findIBSAlternatives(specs);
+
+                document.getElementById('altLoading').classList.add('hidden');
+
+                if (alternatives.length === 0) {
+                    document.getElementById('altEmptyMsg').textContent =
+                        specs.v || specs.ah
+                            ? `Nessuna alternativa trovata per ${specs.v ? specs.v+'V' : ''} ${specs.ah ? specs.ah+'Ah' : ''} nel catalogo IBS.`
+                            : 'Non riesco a trovare le specifiche. Prova a inserire V e Ah nel campo testo (es: "12V 18Ah").';
+                    document.getElementById('altEmpty').classList.remove('hidden');
+                    return;
+                }
+
+                // Mostra specs rilevate
+                document.getElementById('foundV').textContent    = specs.v    ? specs.v + 'V'    : '—';
+                document.getElementById('foundAh').textContent   = specs.ah   ? specs.ah + 'Ah'  : '—';
+                document.getElementById('foundL').textContent    = specs.l    ? specs.l + 'mm'   : '—';
+                document.getElementById('foundW').textContent    = specs.w    ? specs.w + 'mm'   : '—';
+                document.getElementById('foundH').textContent    = specs.h    ? specs.h + 'mm'   : '—';
+                document.getElementById('foundType').textContent = specs.type || '—';
+                document.getElementById('altSource').textContent = specs.source || '';
+
+                // Mostra alternative
+                const badges = [
+                    { label: '⭐ Migliore corrispondenza', cls: 'badge-green', cardCls: 'best' },
+                    { label: '2ª scelta',                  cls: 'badge-orange', cardCls: 'second' },
+                    { label: '3ª scelta',                  cls: 'badge-red',    cardCls: '' },
+                ];
+                document.getElementById('altList').innerHTML = alternatives.slice(0, 3).map((p, i) => {
+                    const b = badges[i] || badges[2];
+                    const diffV  = specs.v  ? Math.abs(parseFloat(p.v)  - parseFloat(specs.v))  : null;
+                    const diffAh = specs.ah ? Math.abs(parseFloat(p.ah) - parseFloat(specs.ah)) : null;
+                    const matchNote = [
+                        diffV  !== null ? (diffV  === 0 ? '✓ Tensione esatta'   : `Δ ${diffV}V`)   : '',
+                        diffAh !== null ? (diffAh === 0 ? '✓ Capacità esatta'   : `Δ ${diffAh}Ah`) : '',
+                    ].filter(Boolean).join(' &nbsp;·&nbsp; ');
+
+                    return `<div class="alt-card ${b.cardCls}">
+                        <span class="alt-badge ${b.cls}">${b.label}</span>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div style="font-size:20px; font-weight:bold; color:#e74c3c;">${p.codice}</div>
+                                <div class="alt-specs">
+                                    <span>⚡ ${p.v}V</span>
+                                    <span>🔋 ${p.ah}Ah</span>
+                                    <span>📐 ${p.lunghezza}×${p.larghezza}×${p.altezza}mm</span>
+                                    <span>⚖️ ${p.peso}kg</span>
+                                </div>
+                                <div style="font-size:12px; color:#888; margin-top:4px;">${matchNote}</div>
+                            </div>
+                            <div style="text-align:right; flex-shrink:0; margin-left:10px;">
+                                <div style="font-size:18px; font-weight:bold; color:#34495e;">€${p.listino.toFixed(2)}</div>
+                                <button class="btn-green" style="margin-top:8px; padding:8px 12px; font-size:12px;"
+                                    onclick="selectProductFromAlt('${p.codice}')">
+                                    📋 Usa per preventivo
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                document.getElementById('altResults').classList.remove('hidden');
+
+            } catch (err) {
+                document.getElementById('altLoading').classList.add('hidden');
+                alert('Errore durante la ricerca: ' + err.message);
+                console.error(err);
+            }
+        }
+
+        function resetAlternative() {
+            altPhotoBase64 = null;
+            document.getElementById('altCodeInput').value = '';
+            document.getElementById('altPhotoInput').value = '';
+            const preview = document.getElementById('altPreview');
+            preview.src = '';
+            preview.style.display = 'none';
+            document.getElementById('dropText').style.display = 'block';
+            document.getElementById('dropZone').classList.remove('drag-over');
+            document.getElementById('altResults').classList.add('hidden');
+            document.getElementById('altEmpty').classList.add('hidden');
+            document.getElementById('altLoading').classList.add('hidden');
+        }
+
+        function setLoadingMsg(msg) {
+            document.getElementById('altLoadingMsg').textContent = msg;
+        }
+
+        // Estrae V e Ah direttamente dal codice/testo (pattern comuni)
+        function extractSpecsFromCode(text) {
+            const specs = { v: null, ah: null, l: null, w: null, h: null, type: null, source: '' };
+            if (!text) return specs;
+            const t = text.toUpperCase();
+
+            // Tensione: 12V, 6V, 24V, 48V...
+            const vMatch = t.match(/\b(2|4|6|8|12|24|36|48|72|80)\s*V\b/);
+            if (vMatch) specs.v = vMatch[1];
+
+            // Capacità: 18Ah, 100AH, 18 AH...
+            const ahMatch = t.match(/\b(\d{1,4})\s*AH\b/);
+            if (ahMatch) specs.ah = ahMatch[1];
+
+            // Dimensioni: 181x77x167mm o simili
+            const dimMatch = t.match(/(\d{2,3})\s*[xX×]\s*(\d{2,3})\s*[xX×]\s*(\d{2,3})/);
+            if (dimMatch) { specs.l = dimMatch[1]; specs.w = dimMatch[2]; specs.h = dimMatch[3]; }
+
+            // Tipo
+            if (t.includes('AGM') || t.includes('VRLA')) specs.type = 'AGM';
+            else if (t.includes('GEL')) specs.type = 'GEL';
+            else if (t.includes('LITIO') || t.includes('LIFEPO') || t.includes('LFP')) specs.type = 'LiFePO4';
+
+            if (specs.v || specs.ah) specs.source = '📝 Specifiche estratte dal testo inserito';
+            return specs;
+        }
+
+        // Cerca su Google Custom Search e prova a parsare il risultato
+        async function searchSpecsOnGoogle(query, existingSpecs) {
+            const q = encodeURIComponent(query + ' batteria specifiche tecniche V Ah dimensioni datasheet');
+            const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_API_KEY}&cx=${GOOGLE_CX}&q=${q}&num=5`;
+
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error('Google API error: ' + resp.status);
+            const data = await resp.json();
+
+            if (!data.items || data.items.length === 0) return existingSpecs;
+
+            // Combina tutti gli snippet e prova a estrarre specs
+            const fullText = data.items.map(item =>
+                (item.title || '') + ' ' + (item.snippet || '') + ' ' + (item.pagemap?.metatags?.[0]?.['og:description'] || '')
+            ).join(' ');
+
+            const specs = extractSpecsFromCode(fullText);
+
+            // Mantieni specs già trovate dal codice
+            if (!specs.v  && existingSpecs.v)  specs.v  = existingSpecs.v;
+            if (!specs.ah && existingSpecs.ah) specs.ah = existingSpecs.ah;
+            if (!specs.l  && existingSpecs.l)  specs.l  = existingSpecs.l;
+            if (!specs.w  && existingSpecs.w)  specs.w  = existingSpecs.w;
+            if (!specs.h  && existingSpecs.h)  specs.h  = existingSpecs.h;
+
+            if (specs.v || specs.ah) {
+                specs.source = `🌐 Specifiche trovate tramite ricerca web (fonte: ${data.items[0].displayLink})`;
+            }
+            return specs;
+        }
+
+        // Match nel catalogo IBS: prima dimensioni, poi V e Ah
+        function findIBSAlternatives(specs) {
+            let candidates = [...products];
+
+            // Filtro dimensioni se disponibili (±10mm)
+            if (specs.l && specs.w && specs.h) {
+                const l = parseFloat(specs.l), w = parseFloat(specs.w), h = parseFloat(specs.h);
+                const byDim = candidates.filter(p =>
+                    Math.abs((parseFloat(p.lunghezza)||0) - l) <= 10 &&
+                    Math.abs((parseFloat(p.larghezza)||0) - w) <= 10 &&
+                    Math.abs((parseFloat(p.altezza)||0)   - h) <= 10
+                );
+                if (byDim.length > 0) candidates = byDim;
+            }
+
+            // Filtro tensione esatta se disponibile
+            if (specs.v) {
+                const byV = candidates.filter(p => parseFloat(p.v) === parseFloat(specs.v));
+                if (byV.length > 0) candidates = byV;
+            }
+
+            // Ordina per Ah più vicino
+            if (specs.ah) {
+                const targetAh = parseFloat(specs.ah);
+                candidates.sort((a, b) =>
+                    Math.abs((parseFloat(a.ah)||0) - targetAh) -
+                    Math.abs((parseFloat(b.ah)||0) - targetAh)
+                );
+            }
+
+            return candidates.slice(0, 3);
+        }
+
+        // Passa il prodotto alla tab Ricerca per fare il preventivo
+        function selectProductFromAlt(code) {
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', i === 0);
+            });
+            ['searchTab','alternativeTab','uploadTab','historyTab'].forEach((id, i) => {
+                document.getElementById(id).className = i === 0 ? '' : 'hidden';
+            });
+            document.getElementById('searchInput').value = code;
+            search();
+            setTimeout(() => selectProduct(code), 100);
         }
 
         function setSearchType(type) {
@@ -389,11 +882,13 @@
 
         function copyQuote() {
             if (!selectedProduct) return;
-            const qty = document.getElementById('qty').value;
+            const qty = parseInt(document.getElementById('qty').value) || 1;
             const net = document.getElementById('netPrice').textContent;
+            const netVal = parseFloat(net.replace('€','').replace(',','.')) || 0;
             const peso = parseFloat(selectedProduct.peso) || 0;
-            const pesoTotale = peso * parseInt(qty);
-            let trasporto = pesoTotale <= 100 ? '€20,00' : '€' + (Math.ceil(pesoTotale / 100) * 15).toFixed(2).replace('.', ',');
+            const pesoTotale = peso * qty;
+            const valoreMerce = netVal * qty;
+            const trasporto = calcTrasporto(pesoTotale, valoreMerce);
             const ah = parseFloat(selectedProduct.ah) || 0;
             let qreUnitario = ah <= 20 ? 0.26 : (ah <= 95 ? 1.10 : 2.20);
             const qreFormatted = '€' + qreUnitario.toFixed(2).replace('.', ',') + ' Cad. Btr.';
@@ -421,13 +916,157 @@
             }
         }
 
+        function copyQuoteRapido() {
+            if (!selectedProduct) return;
+            const qty = parseInt(document.getElementById('qty').value) || 1;
+            const net = document.getElementById('netPrice').textContent;
+            const netVal = parseFloat(net.replace('€','').replace(',','.')) || 0;
+            const peso = parseFloat(selectedProduct.peso) || 0;
+            const pesoTotale = peso * qty;
+            const valoreMerce = netVal * qty;
+            const trasporto = calcTrasporto(pesoTotale, valoreMerce);
+            const ah = parseFloat(selectedProduct.ah) || 0;
+            const qreUnitario = ah <= 20 ? 0.26 : (ah <= 95 ? 1.10 : 2.20);
+            const qreFormatted = '€' + qreUnitario.toFixed(2).replace('.', ',') + ' Cad. Btr.';
+            const text =
+                'Buongiorno, grazie mille per la richiesta, di seguito la quotazione:\n\n' +
+                'Nr. ' + qty + ' ' + selectedProduct.codice + ': ' + net + ' +IVA CAD\n' +
+                'Trasporto: ' + trasporto + '\n' +
+                'QRE: ' + qreFormatted + '\n' +
+                'Consegna: Pronta Consegna\n\n' +
+                'Buona giornata';
+            if (copyToClipboardFallback(text)) alert('⚡ Preventivo Rapido copiato!');
+        }
+
+        // ── CARRELLO ──
+        let cart = {}; // { codice: { product, qty, netPrice } }
+        let cartOpen = false;
+
+        function calcNetPrice() {
+            if (!selectedProduct) return 0;
+            const list = selectedProduct.listino;
+            const d1 = parseFloat(document.getElementById('disc1').value) || 0;
+            const d2 = parseFloat(document.getElementById('disc2').value) || 0;
+            return list * (1 - d1/100) * (1 - d2/100);
+        }
+
+        function addToCart() {
+            if (!selectedProduct) return;
+            const qty = parseInt(document.getElementById('qty').value) || 1;
+            const net = calcNetPrice();
+            const code = selectedProduct.codice;
+            if (cart[code]) {
+                cart[code].qty += qty;
+            } else {
+                cart[code] = { product: { ...selectedProduct }, qty, netPrice: net };
+            }
+            updateCartUI();
+            // Feedback
+            const btn = event.target;
+            const orig = btn.textContent;
+            btn.textContent = '✓ Aggiunto!';
+            btn.style.background = '#1e8449';
+            setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
+        }
+
+        function removeFromCart(code) {
+            delete cart[code];
+            updateCartUI();
+        }
+
+        function updateCartQty(code, val) {
+            const qty = parseInt(val) || 1;
+            if (qty <= 0) { removeFromCart(code); return; }
+            cart[code].qty = qty;
+            updateCartUI();
+        }
+
+        function clearCart() {
+            if (!confirm('Svuotare il carrello?')) return;
+            cart = {};
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            cartOpen = !cartOpen;
+            document.getElementById('cartBody').className = 'cart-body' + (cartOpen ? ' open' : '');
+            document.getElementById('cartToggleBtn').textContent = cartOpen ? '▼' : '▲';
+        }
+
+        function updateCartUI() {
+            const items = Object.values(cart);
+            const badge = document.getElementById('cartBadge');
+            const totalPreview = document.getElementById('cartTotalPreview');
+            const totalVal = document.getElementById('cartTotalVal');
+            const cartItemsEl = document.getElementById('cartItems');
+
+            const totalQty = items.reduce((s, i) => s + i.qty, 0);
+            const totalPrice = items.reduce((s, i) => s + i.netPrice * i.qty, 0);
+
+            badge.textContent = totalQty;
+            const totalStr = totalPrice.toFixed(2).replace('.', ',');
+            totalPreview.textContent = '€' + totalStr;
+            totalVal.textContent = totalStr;
+
+            if (items.length === 0) {
+                cartItemsEl.innerHTML = '<div class="cart-empty">Il carrello è vuoto</div>';
+                return;
+            }
+
+            cartItemsEl.innerHTML = items.map(i => {
+                const lineTotal = (i.netPrice * i.qty).toFixed(2).replace('.', ',');
+                return `<div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-code">${i.product.codice}</div>
+                        <div class="cart-item-detail">${i.product.v}V ${i.product.ah}Ah — €${i.netPrice.toFixed(2)} cad.</div>
+                    </div>
+                    <div class="cart-item-right">
+                        <input class="cart-qty-input" type="number" value="${i.qty}" min="1"
+                            onchange="updateCartQty('${i.product.codice}', this.value)">
+                        <span class="cart-item-price">€${lineTotal}</span>
+                        <button class="cart-remove-btn" onclick="removeFromCart('${i.product.codice}')">×</button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Apri automaticamente se appena aggiunto
+            if (!cartOpen && items.length > 0) {
+                cartOpen = true;
+                document.getElementById('cartBody').className = 'cart-body open';
+                document.getElementById('cartToggleBtn').textContent = '▼';
+            }
+        }
+
+        function copyCartOrder() {
+            const items = Object.values(cart);
+            if (items.length === 0) return alert('Il carrello è vuoto!');
+
+            const pesoTotale = items.reduce((s, i) => s + (parseFloat(i.product.peso) || 0) * i.qty, 0);
+            const valoreMerce = items.reduce((s, i) => s + i.netPrice * i.qty, 0);
+            const trasporto = calcTrasporto(pesoTotale, valoreMerce);
+
+            const righe = items.map(i =>
+                'Nr. ' + i.qty + ' ' + i.product.codice + ': €' + i.netPrice.toFixed(2) + ' cad.'
+            ).join('\n');
+
+            const order =
+                'Buongiorno,\nper il cliente in oggetto nuovo ordine del seguente materiale:\n\n' +
+                righe + '\n' +
+                'Trasporto: ' + trasporto + '\n\n' +
+                'Grazie\nBuona giornata';
+
+            if (copyToClipboardFallback(order)) alert('📋 Ordine Multiplo copiato!');
+        }
+
         function copyOrder() {
             if (!selectedProduct) return;
-            const qty = document.getElementById('qty').value;
+            const qty = parseInt(document.getElementById('qty').value) || 1;
             const net = document.getElementById('netPrice').textContent;
+            const netVal = parseFloat(net.replace('€','').replace(',','.')) || 0;
             const peso = parseFloat(selectedProduct.peso) || 0;
-            const pesoTotale = peso * parseInt(qty);
-            let trasporto = pesoTotale <= 100 ? '€20,00' : '€' + (Math.ceil(pesoTotale / 100) * 15).toFixed(2).replace('.', ',');
+            const pesoTotale = peso * qty;
+            const valoreMerce = netVal * qty;
+            const trasporto = calcTrasporto(pesoTotale, valoreMerce);
             const order = 'Buongiorno,\nper il cliente in oggetto nuovo ordine del seguente materiale:\n\n' +
                 'Nr. ' + qty + ' ' + selectedProduct.codice + ': ' + net + '\n' +
                 'Trasporto: ' + trasporto + '\n\n' +
@@ -518,7 +1157,9 @@
             if (!prod) return alert('Prodotto non trovato');
             const peso = parseFloat(prod.peso) || 0;
             const pesoTotale = peso * parseInt(item.quantita);
-            let trasporto = pesoTotale <= 100 ? '€20,00' : '€' + (Math.ceil(pesoTotale / 100) * 15).toFixed(2).replace('.', ',');
+            const netVal = parseFloat((item.prezzoNetto || '0').replace('€','').replace(',','.')) || 0;
+            const valoreMerce = netVal * parseInt(item.quantita);
+            const trasporto = calcTrasporto(pesoTotale, valoreMerce);
             const order = 'Buongiorno,\nper il cliente in oggetto nuovo ordine del seguente materiale:\n\n' +
                 'Nr. ' + item.quantita + ' ' + item.codice + ': ' + item.prezzoNetto + '\n' +
                 'Trasporto: ' + trasporto + '\n\n' +
