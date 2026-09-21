@@ -55,32 +55,53 @@
 
         /* Carrello flottante */
         .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: #27ae60; color: white; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); transition: all 0.3s; }
-        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; cursor: pointer; }
-        .cart-header-left { display: flex; align-items: center; gap: 10px; }
-        .cart-title { font-weight: bold; font-size: 16px; }
-        .cart-badge { background: white; color: #27ae60; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; cursor: pointer; }
+        .cart-header-left { display: flex; align-items: center; gap: 8px; }
+        .cart-title { font-weight: bold; font-size: 15px; }
+        .cart-badge { background: white; color: #27ae60; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; flex-shrink: 0; }
         .cart-total-preview { font-size: 15px; font-weight: bold; }
-        .cart-toggle-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+        .cart-toggle-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .cart-body { background: white; color: #333; max-height: 0; overflow: hidden; transition: max-height 0.3s; }
-        .cart-body.open { max-height: 500px; overflow-y: auto; }
-        .cart-items { padding: 15px; }
+        .cart-body.open { max-height: 60vh; overflow-y: auto; }
+        .cart-items { padding: 10px 12px; }
         .cart-empty { color: #999; text-align: center; padding: 20px; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; gap: 10px; }
-        .cart-item-info { flex: 1; }
-        .cart-item-code { font-weight: bold; color: #e74c3c; font-size: 15px; }
-        .cart-item-detail { font-size: 12px; color: #666; margin-top: 2px; }
-        .cart-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .cart-qty-input { width: 50px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; text-align: center; font-size: 14px; }
-        .cart-item-price { font-weight: bold; color: #34495e; min-width: 70px; text-align: right; }
-        .cart-remove-btn { background: #e74c3c; border: none; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 14px; line-height: 1; display: flex; align-items: center; justify-content: center; }
-        .cart-footer { padding: 15px; border-top: 2px solid #eee; background: #f9f9f9; }
-        .cart-total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .cart-total-label { font-size: 14px; color: #666; }
-        .cart-total-amount { font-size: 22px; font-weight: bold; color: #34495e; }
-        .cart-actions { display: flex; gap: 10px; }
-        .cart-copy-btn { flex: 1; background: #27ae60; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; }
-        .cart-clear-btn { background: #95a5a6; color: white; border: none; padding: 12px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; gap: 8px; }
+        .cart-item-info { flex: 1; min-width: 0; }
+        .cart-item-code { font-weight: bold; color: #e74c3c; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cart-item-detail { font-size: 11px; color: #666; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cart-item-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        /* Controllo qty compatto */
+        .cart-qty-ctrl { display: flex; align-items: center; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; }
+        .cart-qty-btn { background: #f0f0f0; border: none; width: 28px; height: 32px; font-size: 16px; cursor: pointer; color: #34495e; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .cart-qty-btn:active { background: #ddd; }
+        .cart-qty-num { width: 32px; text-align: center; font-size: 14px; font-weight: bold; color: #333; border: none; background: white; padding: 0; }
+        .cart-item-price { font-weight: bold; color: #34495e; font-size: 13px; min-width: 60px; text-align: right; }
+        .cart-remove-btn { background: #e74c3c; border: none; color: white; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .cart-footer { padding: 12px; border-top: 2px solid #eee; background: #f9f9f9; }
+        .cart-total-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .cart-total-label { font-size: 13px; color: #666; }
+        .cart-total-amount { font-size: 20px; font-weight: bold; color: #34495e; }
+        .cart-trasporto-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .cart-trasporto-label { font-size: 12px; color: #999; }
+        .cart-trasporto-val { font-size: 13px; font-weight: bold; color: #27ae60; }
+        .cart-actions { display: flex; gap: 8px; }
+        .cart-copy-btn { flex: 1; background: #27ae60; color: white; border: none; padding: 12px 8px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .cart-clear-btn { background: #95a5a6; color: white; border: none; padding: 12px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
         body { padding-bottom: 70px; }
+
+        /* Responsive generale */
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .header { padding: 12px; }
+            .header h1 { font-size: 22px; }
+            .tabs { gap: 6px; }
+            .tab { padding: 10px 12px; font-size: 12px; }
+            .card { padding: 14px; }
+            .btn-group { gap: 8px; }
+            .grid { gap: 10px; }
+            .price-box { flex-direction: column; align-items: flex-start; gap: 5px; }
+            #netPrice { font-size: 22px !important; }
+        }
 
         /* Tab Trova Alternativa */
         .alt-drop-zone { border: 2px dashed #ddd; border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 15px; background: #fafafa; }
@@ -317,8 +338,12 @@
             </div>
             <div class="cart-footer">
                 <div class="cart-total-row">
-                    <span class="cart-total-label">Totale ordine</span>
+                    <span class="cart-total-label">Totale merce</span>
                     <span class="cart-total-amount">€ <span id="cartTotalVal">0,00</span></span>
+                </div>
+                <div class="cart-trasporto-row">
+                    <span class="cart-trasporto-label">Trasporto</span>
+                    <span class="cart-trasporto-val" id="cartTrasporto">€20,00</span>
                 </div>
                 <div class="cart-actions">
                     <button class="cart-copy-btn" onclick="copyCartOrder()">📋 Copia Ordine</button>
@@ -950,6 +975,8 @@
             return list * (1 - d1/100) * (1 - d2/100);
         }
 
+        let cartAutoCloseTimer = null;
+
         function addToCart() {
             if (!selectedProduct) return;
             const qty = parseInt(document.getElementById('qty').value) || 1;
@@ -961,7 +988,21 @@
                 cart[code] = { product: { ...selectedProduct }, qty, netPrice: net };
             }
             updateCartUI();
-            // Feedback
+
+            // Apri il carrello e chiudi automaticamente dopo 5 secondi
+            if (!cartOpen) {
+                cartOpen = true;
+                document.getElementById('cartBody').className = 'cart-body open';
+                document.getElementById('cartToggleBtn').textContent = '▼';
+            }
+            if (cartAutoCloseTimer) clearTimeout(cartAutoCloseTimer);
+            cartAutoCloseTimer = setTimeout(() => {
+                cartOpen = false;
+                document.getElementById('cartBody').className = 'cart-body';
+                document.getElementById('cartToggleBtn').textContent = '▲';
+            }, 5000);
+
+            // Feedback visivo
             const btn = event.target;
             const orig = btn.textContent;
             btn.textContent = '✓ Aggiunto!';
@@ -974,10 +1015,9 @@
             updateCartUI();
         }
 
-        function updateCartQty(code, val) {
-            const qty = parseInt(val) || 1;
-            if (qty <= 0) { removeFromCart(code); return; }
-            cart[code].qty = qty;
+        function updateCartQty(code, delta) {
+            if (!cart[code]) return;
+            cart[code].qty = Math.max(1, cart[code].qty + delta);
             updateCartUI();
         }
 
@@ -988,6 +1028,7 @@
         }
 
         function toggleCart() {
+            if (cartAutoCloseTimer) clearTimeout(cartAutoCloseTimer);
             cartOpen = !cartOpen;
             document.getElementById('cartBody').className = 'cart-body' + (cartOpen ? ' open' : '');
             document.getElementById('cartToggleBtn').textContent = cartOpen ? '▼' : '▲';
@@ -995,19 +1036,17 @@
 
         function updateCartUI() {
             const items = Object.values(cart);
-            const badge = document.getElementById('cartBadge');
-            const totalPreview = document.getElementById('cartTotalPreview');
-            const totalVal = document.getElementById('cartTotalVal');
-            const cartItemsEl = document.getElementById('cartItems');
-
-            const totalQty = items.reduce((s, i) => s + i.qty, 0);
+            const totalQty   = items.reduce((s, i) => s + i.qty, 0);
             const totalPrice = items.reduce((s, i) => s + i.netPrice * i.qty, 0);
+            const pesoTotale = items.reduce((s, i) => s + (parseFloat(i.product.peso) || 0) * i.qty, 0);
+            const trasporto  = items.length ? calcTrasporto(pesoTotale, totalPrice) : '—';
 
-            badge.textContent = totalQty;
-            const totalStr = totalPrice.toFixed(2).replace('.', ',');
-            totalPreview.textContent = '€' + totalStr;
-            totalVal.textContent = totalStr;
+            document.getElementById('cartBadge').textContent       = totalQty;
+            document.getElementById('cartTotalPreview').textContent = '€' + totalPrice.toFixed(2).replace('.', ',');
+            document.getElementById('cartTotalVal').textContent     = totalPrice.toFixed(2).replace('.', ',');
+            document.getElementById('cartTrasporto').textContent    = trasporto;
 
+            const cartItemsEl = document.getElementById('cartItems');
             if (items.length === 0) {
                 cartItemsEl.innerHTML = '<div class="cart-empty">Il carrello è vuoto</div>';
                 return;
@@ -1018,23 +1057,19 @@
                 return `<div class="cart-item">
                     <div class="cart-item-info">
                         <div class="cart-item-code">${i.product.codice}</div>
-                        <div class="cart-item-detail">${i.product.v}V ${i.product.ah}Ah — €${i.netPrice.toFixed(2)} cad.</div>
+                        <div class="cart-item-detail">${i.product.v}V ${i.product.ah}Ah · €${i.netPrice.toFixed(2)} cad.</div>
                     </div>
                     <div class="cart-item-right">
-                        <input class="cart-qty-input" type="number" value="${i.qty}" min="1"
-                            onchange="updateCartQty('${i.product.codice}', this.value)">
+                        <div class="cart-qty-ctrl">
+                            <button class="cart-qty-btn" onclick="updateCartQty('${i.product.codice}', -1)">−</button>
+                            <span class="cart-qty-num">${i.qty}</span>
+                            <button class="cart-qty-btn" onclick="updateCartQty('${i.product.codice}', +1)">+</button>
+                        </div>
                         <span class="cart-item-price">€${lineTotal}</span>
                         <button class="cart-remove-btn" onclick="removeFromCart('${i.product.codice}')">×</button>
                     </div>
                 </div>`;
             }).join('');
-
-            // Apri automaticamente se appena aggiunto
-            if (!cartOpen && items.length > 0) {
-                cartOpen = true;
-                document.getElementById('cartBody').className = 'cart-body open';
-                document.getElementById('cartToggleBtn').textContent = '▼';
-            }
         }
 
         function copyCartOrder() {
